@@ -1,4 +1,4 @@
-module github.com/Yandex-Practicum/tracker
+module github.com/kisaneodna/go_pirogova_elizaveta.git
 
 go 1.24.1
 
