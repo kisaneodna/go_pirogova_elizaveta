@@ -1,7 +1,14 @@
 package daysteps
 
 import (
+	"errors"
+	"fmt"
+	"log"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/kisaneodna/go_pirogova_elizaveta.git/internal/spentcalories"
 )
 
 const (
@@ -13,8 +20,49 @@ const (
 
 func parsePackage(data string) (int, time.Duration, error) {
 	// TODO: реализовать функцию
+	parts := strings.Split(data, ",")
+	if len(parts) != 2 {
+		return 0, 0, errors.New("неверный формат строки: ожидается 2 части, разделенных запятой")
+	}
+
+	stepsStr := parts[0]
+	durationStr := strings.TrimSpace(parts[1])
+
+	steps, err := strconv.Atoi(stepsStr)
+	if err != nil {
+		return 0, 0, fmt.Errorf("неверный формат шагов: %s", stepsStr)
+	}
+	if steps <= 0 {
+		return 0, 0, fmt.Errorf("количество шагов должно быть положительным: %d", steps)
+	}
+	duration, err := time.ParseDuration(durationStr)
+	if err != nil {
+		return 0, 0, fmt.Errorf("неверный формат продолжительности: %s", durationStr)
+	}
+	if duration <= 0 {
+		return 0, 0, fmt.Errorf("продолжительность должна быть положительной: %v", duration)
+	}
+
+	return steps, duration, nil
 }
 
 func DayActionInfo(data string, weight, height float64) string {
 	// TODO: реализовать функцию
+	steps, duration, err := parsePackage(data)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+
+	if steps <= 0 {
+		log.Println("количество шагов должно быть положительным")
+		return ""
+	}
+
+	distance := (float64(steps) * stepLength) / mInKm
+	calories, _ := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
+
+	return "Количество шагов: " + strconv.Itoa(steps) + ".\n" +
+		"Дистанция составила " + strconv.FormatFloat(distance, 'f', 2, 64) + " км.\n" +
+		"Вы сожгли " + strconv.FormatFloat(calories, 'f', 2, 64) + " ккал.\n"
 }
