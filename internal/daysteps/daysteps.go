@@ -2,10 +2,11 @@ package daysteps
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/kisaneodna/go_pirogova_elizaveta.git/internal/spentcalories"
 )
@@ -21,20 +22,25 @@ func parsePackage(data string) (int, time.Duration, error) {
 	// TODO: реализовать функцию
 	parts := strings.Split(data, ",")
 	if len(parts) != 2 {
-	return 0, 0, errors.New("")
-}
+		return 0, 0, errors.New("неверный формат строки: ожидается 2 части, разделенных запятой")
+	}
 
 	stepsStr := parts[0]
 	durationStr := strings.TrimSpace(parts[1])
 
 	steps, err := strconv.Atoi(stepsStr)
-	if err != nil || steps <= 0 {
-		return 0, 0, errors.New("")
+	if err != nil {
+		return 0, 0, fmt.Errorf("неверный формат шагов: %s", stepsStr)
 	}
-
+	if steps <= 0 {
+		return 0, 0, fmt.Errorf("количество шагов должно быть положительным: %d", steps)
+	}
 	duration, err := time.ParseDuration(durationStr)
-	if err != nil || duration <= 0 {
-		return 0, 0, errors.New("")
+	if err != nil {
+		return 0, 0, fmt.Errorf("неверный формат продолжительности: %s", durationStr)
+	}
+	if duration <= 0 {
+		return 0, 0, fmt.Errorf("продолжительность должна быть положительной: %v", duration)
 	}
 
 	return steps, duration, nil
@@ -49,7 +55,7 @@ func DayActionInfo(data string, weight, height float64) string {
 	}
 
 	if steps <= 0 {
-	log.Println("количество шагов должно быть положительным")
+		log.Println("количество шагов должно быть положительным")
 		return ""
 	}
 

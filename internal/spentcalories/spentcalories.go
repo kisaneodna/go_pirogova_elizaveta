@@ -2,6 +2,7 @@ package spentcalories
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -109,7 +110,7 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	// TODO: реализовать функцию
-	if steps {
+	if steps <= 0 {
 		return 0, errors.New("количество шагов должно быть положительным")
 	}
 	if weight <= 0 {
